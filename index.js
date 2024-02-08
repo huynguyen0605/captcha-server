@@ -1,52 +1,50 @@
-const http = require("http");
-const httpProxy = require("http-proxy");
-const url = require("url");
+const express = require("express");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
-// Create a proxy server
-const proxy = httpProxy.createProxyServer();
+const app = express();
 
-// Create a basic HTTP server
-const server = http.createServer((req, res) => {
-  // Parse the incoming request URL
-  const parsedUrl = url.parse(req.url);
+// Set the target server (replace with your target server's address)
+const target = "http://127.0.0.1:80";
 
-  // Set the target server (replace with your target server's address)
-  const target = {
-    host: "127.0.0.1",
-    port: 80,
-  };
-
-  // Log the request details
-  console.log(
-    `Forwarding request to ${target.host}:${target.port}${parsedUrl.path}`
-  );
-
-  // Forward the request to the target server
-  proxy.web(req, res, { target }, (err, proxyRes, proxyResBody) => {
-    console.log("proxyRes.statusCode", proxyRes.statusCode, err);
-    // Handle proxy errors
-    if (err) {
-      console.error("Proxy Error:", err);
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("An error occurred while processing the request.");
-      return;
-    }
+// Create a proxy middleware
+const proxyMiddleware = createProxyMiddleware({
+  target,
+  changeOrigin: true, // Necessary for virtual hosted sites
+  ws: true, // Proxy websockets
+  logLevel: "debug", // Enable debug logs
+  onError: (err, req, res) => {
+    console.error("Proxy Error:", err);
+    res.writeHead(500, { "Content-Type": "text/plain" });
+    res.end("An error occurred while processing the request.");
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    // Log the status code
+    console.log("proxyRes.statusCode", proxyRes.statusCode);
 
     // Check if the target server returned a 500 error
     if (proxyRes.statusCode === 500) {
-      // Replace "xevil" in the response body
-      console.log("status code = 500");
-      const modifiedBody = proxyResBody.toString().replace(/XEVIL/g, "AHGROUP");
-
-      // Respond with the modified body
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end(modifiedBody);
+      // Replace "XEVIL" in the response body
+      console.log("Status code = 500");
+      const chunks = [];
+      proxyRes.on("data", (chunk) => {
+        chunks.push(chunk);
+      });
+      proxyRes.on("end", () => {
+        const modifiedBody = Buffer.concat(chunks)
+          .toString()
+          .replace(/XEVIL/g, "AHGROUP");
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end(modifiedBody);
+      });
     }
-  });
+  },
 });
 
-// Listen on port 3000 (you can change it to any available port)
-const port = 3003;
-server.listen(port, () => {
+// Use the proxy middleware
+app.use("/", proxyMiddleware);
+
+// Start the server on port 3000 (you can change it to any available port)
+const port = 3000;
+app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
