@@ -33,8 +33,8 @@ const proxyMiddleware = createProxyMiddleware({
         const modifiedBody = Buffer.concat(chunks)
           .toString()
           .replace(/XEVIL/g, "AHGROUP");
-        res.writeHead(500, { "Content-Type": "text/plain" });
-        res.end(modifiedBody);
+        res.write(modifiedBody);
+        res.end();
       });
     }
   },
