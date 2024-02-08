@@ -26,7 +26,7 @@ const proxyMiddleware = createProxyMiddleware({
       // Replace "XEVIL" in the response body
       console.log("Status code = 500");
       res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Internal Server Error");
+      res.end("detect wrong captcha type");
     }
   },
 });
