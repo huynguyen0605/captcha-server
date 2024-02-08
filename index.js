@@ -23,6 +23,7 @@ const server = http.createServer((req, res) => {
 
   // Forward the request to the target server
   proxy.web(req, res, { target }, (err, proxyRes, proxyResBody) => {
+    console.log("proxyRes.statusCode", proxyRes.statusCode);
     // Handle proxy errors
     if (err) {
       console.error("Proxy Error:", err);
