@@ -25,17 +25,8 @@ const proxyMiddleware = createProxyMiddleware({
     if (proxyRes.statusCode === 500) {
       // Replace "XEVIL" in the response body
       console.log("Status code = 500");
-      const chunks = [];
-      proxyRes.on("data", (chunk) => {
-        chunks.push(chunk);
-      });
-      proxyRes.on("end", () => {
-        const modifiedBody = Buffer.concat(chunks)
-          .toString()
-          .replace(/XEVIL/g, "AHGROUP");
-        res.write(modifiedBody);
-        res.end();
-      });
+      res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end("Internal Server Error");
     }
   },
 });
