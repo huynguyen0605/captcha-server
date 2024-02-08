@@ -44,7 +44,7 @@ const proxyMiddleware = createProxyMiddleware({
 app.use("/", proxyMiddleware);
 
 // Start the server on port 3000 (you can change it to any available port)
-const port = 3000;
+const port = 3003;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
