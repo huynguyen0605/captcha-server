@@ -12,7 +12,7 @@ const server = http.createServer((req, res) => {
 
   // Set the target server (replace with your target server's address)
   const target = {
-    host: "localhost",
+    host: "127.0.0.1",
     port: 80,
   };
 
