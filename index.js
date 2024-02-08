@@ -34,6 +34,7 @@ const server = http.createServer((req, res) => {
     // Check if the target server returned a 500 error
     if (proxyRes.statusCode === 500) {
       // Replace "xevil" in the response body
+      console.log("status code = 500");
       const modifiedBody = proxyResBody.toString().replace(/XEVIL/g, "AHGROUP");
 
       // Respond with the modified body
